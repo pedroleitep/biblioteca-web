@@ -1,5 +1,7 @@
 import React from 'react';
-import { BrowserRouter, NavLink, Routes } from 'react-router-dom';
+import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
+import LivroList from './components/LivroList';
+import LivroForm from './components/LivroForm';
 import './App.css';
 
 function App() {
@@ -13,7 +15,11 @@ function App() {
         </nav>
       </header>
       <main className="conteudo">
-        <Routes>{/* rotas de autores e livros entram nas branches feature */}</Routes>
+        <Routes>
+          <Route path="/livros" element={<LivroList />} />
+          <Route path="/livros/novo" element={<LivroForm />} />
+          <Route path="/livros/editar/:id" element={<LivroForm />} />
+        </Routes>
       </main>
     </BrowserRouter>
   );
