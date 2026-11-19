@@ -1,5 +1,7 @@
 import React from 'react';
-import { BrowserRouter, NavLink, Routes } from 'react-router-dom';
+import { BrowserRouter, NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import AutorList from './components/AutorList';
+import AutorForm from './components/AutorForm';
 import './App.css';
 
 function App() {
@@ -13,7 +15,12 @@ function App() {
         </nav>
       </header>
       <main className="conteudo">
-        <Routes>{/* rotas de autores e livros entram nas branches feature */}</Routes>
+        <Routes>
+          <Route path="/" element={<Navigate to="/autores" replace />} />
+          <Route path="/autores" element={<AutorList />} />
+          <Route path="/autores/novo" element={<AutorForm />} />
+          <Route path="/autores/editar/:id" element={<AutorForm />} />
+        </Routes>
       </main>
     </BrowserRouter>
   );
