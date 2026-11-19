@@ -55,6 +55,11 @@ class IntegracaoTest {
                 .andExpect(jsonPath("$.autor.nome").value("Machado de Assis"))
                 .andExpect(jsonPath("$.criadoEm").exists());
 
+        // a data de nascimento deve voltar do banco exatamente como foi enviada (AAAA-MM-DD)
+        mockMvc.perform(get("/api/autores/" + autorId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dataNascimento").value("1839-06-21"));
+
         // (extra) endpoint de livros por autor
         mockMvc.perform(get("/api/livros/autor/" + autorId))
                 .andExpect(status().isOk())
