@@ -2,6 +2,7 @@ package com.biblioteca.controller;
 
 import com.biblioteca.model.Autor;
 import com.biblioteca.repository.AutorRepository;
+import com.biblioteca.repository.LivroRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +30,9 @@ class AutorControllerTest {
 
     @MockBean
     private AutorRepository autorRepository;
+
+    @MockBean
+    private LivroRepository livroRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
@@ -90,5 +94,17 @@ class AutorControllerTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].nome").value("Clarice Lispector"))
                 .andExpect(jsonPath("$[1].nome").value("Machado de Assis"));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 409 ao excluir autor com livros (extra)")
+    void deveRetornar409AoExcluirAutorComLivros() throws Exception {
+        when(autorRepository.existsById(1L)).thenReturn(true);
+        when(livroRepository.existsByAutorId(1L)).thenReturn(true);
+
+        mockMvc.perform(delete("/api/autores/1"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensagem").exists());
+        verify(autorRepository, never()).deleteById(any());
     }
 }
