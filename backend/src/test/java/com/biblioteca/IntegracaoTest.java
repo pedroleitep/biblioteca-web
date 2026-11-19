@@ -89,4 +89,17 @@ class IntegracaoTest {
         mockMvc.perform(get("/api/autores/" + id))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @DisplayName("Deve retornar 409 ao excluir autor que possui livros (extra)")
+    void deveRetornar409AoExcluirAutorComLivros() throws Exception {
+        Long autorId = criarAutor("Jorge Amado");
+        mockMvc.perform(post("/api/livros")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"titulo\":\"Capitaes da Areia\",\"autor\":{\"id\":" + autorId + "}}"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(delete("/api/autores/" + autorId))
+                .andExpect(status().isConflict());
+    }
 }

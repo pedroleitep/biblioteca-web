@@ -2,12 +2,14 @@ package com.biblioteca.controller;
 
 import com.biblioteca.model.Autor;
 import com.biblioteca.repository.AutorRepository;
+import com.biblioteca.repository.LivroRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/autores")
@@ -15,9 +17,11 @@ import java.util.List;
 public class AutorController {
 
     private final AutorRepository autorRepository;
+    private final LivroRepository livroRepository;
 
-    public AutorController(AutorRepository autorRepository) {
+    public AutorController(AutorRepository autorRepository, LivroRepository livroRepository) {
         this.autorRepository = autorRepository;
+        this.livroRepository = livroRepository;
     }
 
     @PostMapping
@@ -51,9 +55,15 @@ public class AutorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
         if (!autorRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
+        }
+        // (extra) autor com livros: em vez do erro da FK, devolve 409 com mensagem amigavel
+        if (livroRepository.existsByAutorId(id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("mensagem",
+                            "Não é possível excluir: o autor possui livros cadastrados. Exclua os livros antes."));
         }
         autorRepository.deleteById(id);
         return ResponseEntity.ok().build();
